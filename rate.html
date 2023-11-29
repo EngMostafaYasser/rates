@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #f8f8f8; /* Optional: Set a light background color */
+    }
+
+    .rating {
+      display: inline-block;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .rating span {
+      color: #777;
+      position: relative;
+      display: inline-block;
+    }
+
+    .rating span:before {
+      content: '\2605';
+      position: absolute;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+
+    .rating span:hover:before,
+    .rating span:hover ~ span:before {
+      opacity: 1;
+    }
+
+    .average-rating {
+      font-size: 18px;
+      margin-top: 10px;
+    }
+
+    .average-rating span {
+      color: #f8d322; /* Star color for average rating */
+      position: relative;
+      display: inline-block;
+    }
+
+    .average-rating span:before {
+      content: '\2605';
+      position: absolute;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+<div id="userRatingSection" class="rating" onclick="rateProduct(event)">
+  <span data-rating="1">☆</span>
+  <span data-rating="2">☆</span>
+  <span data-rating="3">☆</span>
+  <span data-rating="4">☆</span>
+  <span data-rating="5">☆</span>
+</div>
+
+<div id="averageRatingSection" class="average-rating">Average Rating: <span id="averageValue">0</span></div>
+
+<script>
+  const userRated = localStorage.getItem('userRated');
+
+  if (userRated) {
+    document.getElementById('userRatingSection').style.pointerEvents = 'none';
+  }
+
+  let totalRating = parseInt(localStorage.getItem('totalRating')) || 0;
+  let numberOfRatings = parseInt(localStorage.getItem('numberOfRatings')) || 0;
+
+  updateAverageRating();
+
+  function rateProduct(event) {
+    const stars = document.querySelectorAll('.rating span');
+    const clickedRating = parseInt(event.target.dataset.rating);
+
+    totalRating += clickedRating;
+    numberOfRatings++;
+
+    localStorage.setItem('totalRating', totalRating);
+    localStorage.setItem('numberOfRatings', numberOfRatings);
+    localStorage.setItem('userRated', 'true');
+
+    updateAverageRating();
+
+    document.getElementById('userRatingSection').style.pointerEvents = 'none';
+
+    stars.forEach((star, index) => {
+      if (index < clickedRating) {
+        star.classList.add('rated');
+      } else {
+        star.classList.remove('rated');
+      }
+    });
+  }
+
+  function updateAverageRating() {
+    const averageRating = totalRating / numberOfRatings;
+    document.getElementById('averageValue').innerText = averageRating.toFixed(2);
+  }
+</script>
+
+</body>
+</html>
